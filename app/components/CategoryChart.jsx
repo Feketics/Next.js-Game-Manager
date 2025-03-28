@@ -5,16 +5,20 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function CategoryChart({ games }) {
+export default function CategoryChart({ games }) 
+{
   const categoryCounts = {};
-  games.forEach(game => {
+  games.forEach(game => 
+  {
     const category = game.category;
     categoryCounts[category] = (categoryCounts[category] || 0) + 1;
   });
+
   const labels = Object.keys(categoryCounts);
   const data = labels.map(category => categoryCounts[category]);
 
-  const chartData = {
+  const chartData = 
+  {
     labels,
     datasets: [
       {

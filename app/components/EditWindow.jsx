@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-export default function EditWindow({ game, onClose, onSubmit }) 
+export default function EditWindow({ game, onClose, onSubmit, errorMessage }) 
 {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -9,10 +9,11 @@ export default function EditWindow({ game, onClose, onSubmit })
   const [datePublished, setDatePublished] = useState("");
   const [rating, setRating] = useState("");
   const [category, setCategory] = useState("");
-  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (game) {
+  useEffect(() => 
+  {
+    if (game) 
+    {
       setName(game.name || "");
       setDescription(game.description || "");
       setPublisher(game.publisher || "");
@@ -21,91 +22,12 @@ export default function EditWindow({ game, onClose, onSubmit })
       setCategory(game.category || "");
     }
   }, [game]);
-
-  const isValidName = () => {
-    if(name.trim() == "") return false;
-    return true;
-  }
-
-  const isValidDescr = () => {
-    if(description.trim() == "") return false;
-    return true;
-  }
-
-  const isValidPublisher = () => {
-    if(publisher.trim() == "") return false;
-    return true;
-  }
-
-  const isValidDate = () => {
-    if(datePublished)
-    {
-      const minDate = new Date("1970-01-01");
-      const today = new Date();
-      const date = new Date(datePublished);
-      if(date > today) return false;
-      if(date < minDate) return false;
-      return true;
-    }
-    return false;
-  }
-
-  const isValidRating = () => {
-    const numRating = Number(rating);
-    if (isNaN(numRating) || numRating < 1 || numRating > 10) return false;
-
-    const ratingParts = rating.toString().split(".");
-    if (ratingParts.length === 2 && ratingParts[1].length > 2) return false;
-
-    return true;
-  }
-
-  const isValidCategory = () => {
-    if(category.trim() == "") return false;
-    return true;
-  }
   
-  const handleSubmit = () => {
-    
-    if(!isValidName())
+  const handleSubmit = () => 
+  {
+    const updatedGame = 
     {
-      setError("Input field for Name cannot be empty!");
-      return;
-    }
-
-    if(!isValidDescr())
-    {
-      setError("Input field for Description cannot be empty!");
-      return;
-    }
-
-    if(!isValidPublisher())
-    {
-      setError("Input field for Publisher cannot be empty!");
-      return;
-    }
-
-    if(!isValidDate())
-    {
-      setError("Please pick a date within the valid interval! ( 01/01/1970 - today )");
-      return;
-    }
-
-    if(!isValidRating())
-    {
-      setError("Rating for the game must be a number between 1 and 10, with at most 2 decimals!");
-      return;
-    }
-
-    if(!isValidCategory())
-    {
-      setError("Input field for Category cannot be empty!");
-      return;
-    }
-    
-    setError("");
-    const updatedGame = {
-      id: game?.id, // if existing game, keep ID
+      id: game?.id,
       name,
       description,
       publisher,
@@ -200,9 +122,9 @@ export default function EditWindow({ game, onClose, onSubmit })
             />
           </label>
 
-          {error && (
+          {errorMessage && (
           <div style={{ color: "red", marginBottom: "0.5rem" }}>
-            {error}
+            {errorMessage}
           </div>
           )}
         </div>

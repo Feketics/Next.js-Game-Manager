@@ -5,21 +5,26 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Lege
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-export default function YearChart({ games }) {
+export default function YearChart({ games }) 
+{
   const yearCounts = {};
-  games.forEach(game => {
-    if (game.datePublished) {
+  games.forEach(game => 
+  {
+    if (game.datePublished) 
+    {
       const year = new Date(game.datePublished).getFullYear();
       yearCounts[year] = (yearCounts[year] || 0) + 1;
     }
   });
+
   const labels = Object.keys(yearCounts).sort();
   const dataValues = labels.map(year => yearCounts[year]);
 
   const maxDataValue = Math.max(...dataValues);
   const yMax = Math.ceil(maxDataValue * 1.2);
 
-  const chartData = {
+  const chartData = 
+  {
     labels,
     datasets: [
       {
@@ -30,9 +35,12 @@ export default function YearChart({ games }) {
     ],
   };
 
-  const options = {
-    scales: {
-      y: {
+  const options = 
+  {
+    scales: 
+    {
+      y: 
+      {
         beginAtZero: true,
         max: yMax,
       },

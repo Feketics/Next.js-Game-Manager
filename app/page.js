@@ -1,142 +1,158 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MainWindow from "./components/MainWindow";
 import EditWindow from "./components/EditWindow";
 import ConfirmationWindow from "./components/ConfirmationWindow";
 
 export default function HomePage() 
 {
-  // Example hardcoded data
-  const [games, setGames] = useState([
-    {
-      id: 1,
-      name: "Factorio",
-      description: "The Factory must grow!",
-      publisher: "Publisher1",
-      datePublished: "2023-01-01",
-      rating: 8.5,
-      category: "Strategy",
-    },
-    {
-      id: 2,
-      name: "Terraria",
-      description: "Idk haven't played it.",
-      publisher: "Publisher2",
-      datePublished: "2023-11-01",
-      rating: 8,
-      category: "Rpg",
-    },
-    {
-      id: 3,
-      name: "Baldur's Gate 3",
-      description: "The gate that belongs to Baldur or something.",
-      publisher: "Publisher1",
-      datePublished: "2024-07-18",
-      rating: 8.75,
-      category: "Rpg",
-    },
-    {
-      id: 4,
-      name: "Minecraft",
-      description: "It's minecraft.",
-      publisher: "Publisher2",
-      datePublished: "2002-11-21",
-      rating: 9,
-      category: "Sandbox",
-    },
-    {
-      id: 5,
-      name: "League of Legends",
-      description: "Rating given by the players, not me!",
-      publisher: "Publisher3",
-      datePublished: "2017-12-12",
-      rating: 7,
-      category: "Moba?",
-    },
-    {
-      id: 6,
-      name: "Stellaris",
-      description: "Not for the faint of heart.",
-      publisher: "Paradox",
-      datePublished: "2023-01-01",
-      rating: 7.95,
-      category: "Strategy",
-    },
-  ]);
-
-  // State for controlling popups
+  const [games, setGames] = useState([]);
+  const [totalGames, setTotalGames] = useState(0);
+  const [allGames, setAllGames] = useState([]);
   const [showEdit, setShowEdit] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
   const [isNewEntry, setIsNewEntry] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("name-asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
-  // Handle "New Entry"
+  const fetchGames = async () => 
+  {
+    try 
+    {
+      const query = new URLSearchParams({
+        search: searchTerm,
+        sort: sortOption,
+        page: currentPage.toString(),
+        limit: itemsPerPage.toString(),
+      });
+      const res = await fetch(`/api/games?${query.toString()}`);
+      const json = await res.json();
+      setGames(json.data);
+      setTotalGames(json.total);
+      setAllGames(json.allData);
+    } 
+    catch (error) 
+    {
+      console.error("Error fetching games:", error);
+    }
+  };
+
+  useEffect(() => {fetchGames();}, [searchTerm, sortOption, currentPage]);
+
   const handleNewEntry = () => 
   {
     setSelectedGame(null);
     setIsNewEntry(true);
     setShowEdit(true);
+    setErrorMessage("");
   };
 
-  // Handle "Edit"
   const handleEdit = (game) => 
   {
     setSelectedGame(game);
     setIsNewEntry(false);
     setShowEdit(true);
+    setErrorMessage("");
   };
 
-  // Handle "Delete"
   const handleDelete = (game) => 
   {
     setSelectedGame(game);
     setShowConfirmation(true);
   };
 
-  // Callback: user submitted the EditWindow
-  const handleEditSubmit = (updatedGame) => 
+  const handleSearchChange = (term) => 
   {
-    if (isNewEntry) 
-    {
-      // Create new
-      setGames((prev) => [...prev, { ...updatedGame, id: Date.now() }]);
-    } 
-    else 
-    {
-      // Update existing
-      setGames((prev) =>
-        prev.map((g) => (g.id === updatedGame.id ? updatedGame : g))
-      );
-    }
-    setShowEdit(false);
+    setSearchTerm(term);
+    setCurrentPage(1);
   };
 
-  // Callback: user confirmed deletion
-  const handleConfirmDelete = () => 
+  const handleSortChange = (sort) => 
   {
-    setGames((prev) => prev.filter((g) => g.id !== selectedGame.id));
-    setShowConfirmation(false);
+    setSortOption(sort);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => 
+  {
+    setCurrentPage(page);
+  };
+
+  const handleEditSubmit = async (updatedGame) => 
+  {
+    try 
+    {
+      const endpoint = "/api/games";
+      const method = isNewEntry ? "POST" : "PUT";
+      const res = await fetch(endpoint, 
+      {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedGame),
+      });
+
+      const json = await res.json();
+      if (!res.ok) 
+      {
+        setErrorMessage(json.errors ? json.errors.join(" ") : json.error);
+      } 
+      else 
+      {
+        setShowEdit(false);
+        setErrorMessage("");
+        fetchGames();
+      }
+    } 
+    catch (error) 
+    {
+      console.error("Error saving game:", error);
+    }
+  };
+
+  const handleConfirmDelete = async () => 
+  {
+    try 
+    {
+      await fetch(`/api/games?id=${selectedGame.id}`, {method: "DELETE",});
+      setShowConfirmation(false);
+      setCurrentPage(1);
+      fetchGames();
+    } 
+    catch (error) 
+    {
+      console.error("Error deleting game:", error);
+    }
   };
 
   return (
     <div style={{ position: "relative" }}>
       <MainWindow
         games={games}
+        totalGames={totalGames}
+        allGames={allGames}
         onNewEntry={handleNewEntry}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        searchTerm={searchTerm}
+        sortOption={sortOption}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        onSearchChange={handleSearchChange}
+        onSortChange={handleSortChange}
+        onPageChange={handlePageChange}
       />
-
-      {/* Edit Popup */}
       {showEdit && (
         <EditWindow
           game={selectedGame}
           onClose={() => setShowEdit(false)}
           onSubmit={handleEditSubmit}
+          errorMessage={errorMessage}
         />
       )}
-
-      {/* Confirmation Popup */}
       {showConfirmation && (
         <ConfirmationWindow
           message="Are you sure you want to delete this game?"

@@ -5,19 +5,23 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Lege
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-export default function RatingChart({ games }) {
+export default function RatingChart({ games }) 
+{
   const ratingCounts = {};
-  games.forEach(game => {
+  games.forEach(game => 
+  {
     const rating = game.rating;
     ratingCounts[rating] = (ratingCounts[rating] || 0) + 1;
   });
+
   const labels = Object.keys(ratingCounts).sort((a, b) => a - b);
   const dataValues = labels.map(rating => ratingCounts[rating]);
 
   const maxDataValue = Math.max(...dataValues);
   const yMax = Math.ceil(maxDataValue * 1.2);
 
-  const chartData = {
+  const chartData = 
+  {
     labels,
     datasets: [
       {
@@ -28,7 +32,8 @@ export default function RatingChart({ games }) {
     ],
   };
 
-  const options = {
+  const options = 
+  {
     scales: {
       y: {
         beginAtZero: true,
