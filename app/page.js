@@ -1,95 +1,149 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import React, { useState } from "react";
+import MainWindow from "./components/MainWindow";
+import EditWindow from "./components/EditWindow";
+import ConfirmationWindow from "./components/ConfirmationWindow";
 
-export default function Home() {
+export default function HomePage() 
+{
+  // Example hardcoded data
+  const [games, setGames] = useState([
+    {
+      id: 1,
+      name: "Factorio",
+      description: "The Factory must grow!",
+      publisher: "Publisher1",
+      datePublished: "2023-01-01",
+      rating: 8.5,
+      category: "Strategy",
+    },
+    {
+      id: 2,
+      name: "Terraria",
+      description: "Idk haven't played it.",
+      publisher: "Publisher2",
+      datePublished: "2023-11-01",
+      rating: 8,
+      category: "Rpg",
+    },
+    {
+      id: 3,
+      name: "Baldur's Gate 3",
+      description: "The gate that belongs to Baldur or something.",
+      publisher: "Publisher1",
+      datePublished: "2024-07-18",
+      rating: 8.75,
+      category: "Rpg",
+    },
+    {
+      id: 4,
+      name: "Minecraft",
+      description: "It's minecraft.",
+      publisher: "Publisher2",
+      datePublished: "2002-11-21",
+      rating: 9,
+      category: "Sandbox",
+    },
+    {
+      id: 5,
+      name: "League of Legends",
+      description: "Rating given by the players, not me!",
+      publisher: "Publisher3",
+      datePublished: "2017-12-12",
+      rating: 7,
+      category: "Moba?",
+    },
+    {
+      id: 6,
+      name: "Stellaris",
+      description: "Not for the faint of heart.",
+      publisher: "Paradox",
+      datePublished: "2023-01-01",
+      rating: 7.95,
+      category: "Strategy",
+    },
+  ]);
+
+  // State for controlling popups
+  const [showEdit, setShowEdit] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [isNewEntry, setIsNewEntry] = useState(false);
+
+  // Handle "New Entry"
+  const handleNewEntry = () => 
+  {
+    setSelectedGame(null);
+    setIsNewEntry(true);
+    setShowEdit(true);
+  };
+
+  // Handle "Edit"
+  const handleEdit = (game) => 
+  {
+    setSelectedGame(game);
+    setIsNewEntry(false);
+    setShowEdit(true);
+  };
+
+  // Handle "Delete"
+  const handleDelete = (game) => 
+  {
+    setSelectedGame(game);
+    setShowConfirmation(true);
+  };
+
+  // Callback: user submitted the EditWindow
+  const handleEditSubmit = (updatedGame) => 
+  {
+    if (isNewEntry) 
+    {
+      // Create new
+      setGames((prev) => [...prev, { ...updatedGame, id: Date.now() }]);
+    } 
+    else 
+    {
+      // Update existing
+      setGames((prev) =>
+        prev.map((g) => (g.id === updatedGame.id ? updatedGame : g))
+      );
+    }
+    setShowEdit(false);
+  };
+
+  // Callback: user confirmed deletion
+  const handleConfirmDelete = () => 
+  {
+    setGames((prev) => prev.filter((g) => g.id !== selectedGame.id));
+    setShowConfirmation(false);
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div style={{ position: "relative" }}>
+      <MainWindow
+        games={games}
+        onNewEntry={handleNewEntry}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      {/* Edit Popup */}
+      {showEdit && (
+        <EditWindow
+          game={selectedGame}
+          onClose={() => setShowEdit(false)}
+          onSubmit={handleEditSubmit}
+        />
+      )}
+
+      {/* Confirmation Popup */}
+      {showConfirmation && (
+        <ConfirmationWindow
+          message="Are you sure you want to delete this game?"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setShowConfirmation(false)}
+        />
+      )}
     </div>
   );
 }
