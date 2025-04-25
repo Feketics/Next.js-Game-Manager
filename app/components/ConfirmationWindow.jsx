@@ -1,8 +1,22 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function ConfirmationWindow({ message, onConfirm, onCancel }) 
 {
+  
+  const [hasMounted, setHasMounted] = useState(false);
+  
+  useEffect(() => 
+  {
+    setHasMounted(true);
+  }, []);
+
+  // Before mounting, render null so SSR and client outputs match.
+  if (!hasMounted) 
+  {
+    return null;
+  }
+  
   return (
     <div
       style={{

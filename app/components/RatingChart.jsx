@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 
@@ -41,6 +41,18 @@ export default function RatingChart({ games })
       },
     },
   };
+
+  const [hasMounted, setHasMounted] = useState(false);
+  
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  // Before mounting, render null so SSR and client outputs match.
+  if (!hasMounted) 
+  {
+    return null;
+  }
 
   return (
     <div style={{ margin: '2rem 0' }}>

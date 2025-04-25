@@ -1,13 +1,14 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import MainWindow from "./components/MainWindow";
 import EditWindow from "./components/EditWindow";
 import ConfirmationWindow from "./components/ConfirmationWindow";
+import { enqueueOperation } from "./lib/localQueue";
+import { isServerAvailable } from "./lib/serverCheck";
 
 export default function HomePage() 
 {
   const [games, setGames] = useState([]);
-  const [totalGames, setTotalGames] = useState(0);
   const [allGames, setAllGames] = useState([]);
   const [showEdit, setShowEdit] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -17,12 +18,15 @@ export default function HomePage()
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("name-asc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const itemsPerPage = 6;
 
-  const fetchGames = async () => 
+  const fetchGames = useCallback(async () => 
   {
     try 
     {
+      setIsLoading(true);
       const query = new URLSearchParams({
         search: searchTerm,
         sort: sortOption,
@@ -31,17 +35,51 @@ export default function HomePage()
       });
       const res = await fetch(`/api/games?${query.toString()}`);
       const json = await res.json();
-      setGames(json.data);
-      setTotalGames(json.total);
+      
+      setGames(prev => {
+        const newGames = currentPage === 1 ? json.data : [...prev, ...json.data];
+        setHasMore(newGames.length < json.total);
+        return newGames;
+      });
       setAllGames(json.allData);
     } 
     catch (error) 
     {
       console.error("Error fetching games:", error);
+    } 
+    finally 
+    {
+      setIsLoading(false);
+    }
+  }, [searchTerm, sortOption, currentPage]);
+
+  useEffect(() => 
+  {
+    fetchGames();
+  }, [fetchGames]);
+
+  const handleLoadMore = () => 
+  {
+    if (hasMore && !isLoading) 
+    {
+      setCurrentPage(prev => prev + 1);
     }
   };
 
-  useEffect(() => {fetchGames();}, [searchTerm, sortOption, currentPage]);
+  useEffect(() => 
+  {
+    const handleSyncComplete = () => 
+    {
+      console.log("Sync complete event received; refreshing games.");
+      fetchGames();
+    };
+
+    window.addEventListener("syncComplete", handleSyncComplete);
+    return () => 
+    {
+      window.removeEventListener("syncComplete", handleSyncComplete);
+    };
+  }, []);
 
   const handleNewEntry = () => 
   {
@@ -77,54 +115,83 @@ export default function HomePage()
     setCurrentPage(1);
   };
 
-  const handlePageChange = (page) => 
-  {
-    setCurrentPage(page);
-  };
-
   const handleEditSubmit = async (updatedGame) => 
   {
-    try 
+    const online = navigator.onLine;
+    const server = await isServerAvailable();
+    if (!online || !server) 
     {
-      const endpoint = "/api/games";
-      const method = isNewEntry ? "POST" : "PUT";
-      const res = await fetch(endpoint, 
-      {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedGame),
+      enqueueOperation({
+        type: updatedGame.id ? "UPDATE" : "CREATE",
+        endpoint: "/api/games",
+        method: updatedGame.id ? "PUT" : "POST",
+        payload: updatedGame,
       });
-
-      const json = await res.json();
-      if (!res.ok) 
-      {
-        setErrorMessage(json.errors ? json.errors.join(" ") : json.error);
-      } 
-      else 
-      {
-        setShowEdit(false);
-        setErrorMessage("");
-        fetchGames();
-      }
-    } 
-    catch (error) 
+      alert("Offline/server error. Changes will sync automatically later.");
+      setShowEdit(false);
+      return;
+    }
+    else
     {
-      console.error("Error saving game:", error);
+      try 
+      {
+        const endpoint = "/api/games";
+        const method = isNewEntry ? "POST" : "PUT";
+        const res = await fetch(endpoint, 
+        {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedGame),
+        });
+
+        const json = await res.json();
+        if (!res.ok) 
+        {
+          setErrorMessage(json.errors ? json.errors.join(" ") : json.error);
+        } 
+        else 
+        {
+          setShowEdit(false);
+          setErrorMessage("");
+          fetchGames();
+        }
+      } 
+      catch (error) 
+      {
+        console.error("Error saving game:", error);
+      }
     }
   };
 
   const handleConfirmDelete = async () => 
   {
-    try 
+    const online = navigator.onLine;
+    const server = await isServerAvailable();
+    if (!online || !server) 
     {
-      await fetch(`/api/games?id=${selectedGame.id}`, {method: "DELETE",});
+      enqueueOperation({
+        type: "DELETE",
+        endpoint: `/api/games?id=${selectedGame.id}`,
+        method: "DELETE",
+        payload: { id: selectedGame.id },
+      });
+      alert("Delete action queued. Will sync when online.");
       setShowConfirmation(false);
-      setCurrentPage(1);
-      fetchGames();
-    } 
-    catch (error) 
+      return;
+    }
+    else
     {
-      console.error("Error deleting game:", error);
+      try 
+      {
+        await fetch(`/api/games?id=${selectedGame.id}`, {method: "DELETE",});
+        setShowConfirmation(false);
+        setCurrentPage(1);
+        fetchGames();
+      } 
+      catch (error) 
+      {
+        console.error("Error deleting game:", error);
+      }
     }
   };
 
@@ -132,18 +199,17 @@ export default function HomePage()
     <div style={{ position: "relative" }}>
       <MainWindow
         games={games}
-        totalGames={totalGames}
         allGames={allGames}
         onNewEntry={handleNewEntry}
         onEdit={handleEdit}
         onDelete={handleDelete}
         searchTerm={searchTerm}
         sortOption={sortOption}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
         onSearchChange={handleSearchChange}
         onSortChange={handleSortChange}
-        onPageChange={handlePageChange}
+        hasMore={hasMore}
+        isLoading={isLoading}
+        onLoadMore={handleLoadMore}
       />
       {showEdit && (
         <EditWindow

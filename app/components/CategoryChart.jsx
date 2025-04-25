@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -49,6 +49,19 @@ export default function CategoryChart({ games })
       },
     ],
   };
+
+  const [hasMounted, setHasMounted] = useState(false);
+  
+  useEffect(() => 
+  {
+    setHasMounted(true);
+  }, []);
+
+  // Before mounting, render null so SSR and client outputs match.
+  if (!hasMounted) 
+  {
+    return null;
+  }
 
   return (
     <div style={{ margin: '2rem 0' }}>

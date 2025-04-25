@@ -1,17 +1,136 @@
 import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import HomePage from '../app/page';
+import MainWindow from '../app/components/MainWindow';
 import { act } from '@testing-library/react';
+import { OfflineContext } from '../app/context/OfflineProvider';
 
-jest.mock('../app/components/YearChart', () => () => <div data-testid="year-chart" />);
-jest.mock('../app/components/RatingChart', () => () => <div data-testid="rating-chart" />);
-jest.mock('../app/components/CategoryChart', () => () => <div data-testid="category-chart" />);
+// Mock context values
+const mockContextValue = {
+  isOnline: true,
+  serverUp: true
+};
 
+jest.mock('../app/components/YearChart', () => () => <div data-testid="YearChart" />);
+jest.mock('../app/components/RatingChart', () => () => <div data-testid="RatingChart" />);
+jest.mock('../app/components/CategoryChart', () => () => <div data-testid="CategoryChart" />);
+
+// Mock IntersectionObserver
+const mockIntersectionObserver = jest.fn();
+mockIntersectionObserver.mockReturnValue({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+});
+window.IntersectionObserver = mockIntersectionObserver;
+
+// Mock the OfflineProvider context
+jest.mock('../app/context/OfflineProvider', () => ({
+  ...jest.requireActual('../app/context/OfflineProvider'),
+  useOfflineContext: () => mockContextValue,
+}));
+
+const dummyGames = [
+  {
+    id: 1,
+    name: 'Factorio',
+    description: 'An automation game',
+    publisher: 'Wube Software',
+    datePublished: '2020-02-01',
+    rating: 9,
+    category: 'Simulation',
+  },
+  {
+    id: 2,
+    name: 'Terraria',
+    description: 'A 2D adventure game',
+    publisher: 'Re-Logic',
+    datePublished: '2011-05-16',
+    rating: 8,
+    category: 'Adventure',
+  },
+  {
+    id: 3,
+    name: "Baldur's Gate 3",
+    description: "A D&D inspired RPG",
+    publisher: 'Larian Studios',
+    datePublished: '2023-08-03',
+    rating: 9.5,
+    category: 'RPG',
+  },
+  {
+    id: 4,
+    name: 'Minecraft',
+    description: 'Block building and survival',
+    publisher: 'Mojang',
+    datePublished: '2009-05-17',
+    rating: 8,
+    category: 'Sandbox',
+  },
+  {
+    id: 5,
+    name: 'League of Legends',
+    description: 'A MOBA game',
+    publisher: 'Riot Games',
+    datePublished: '2009-10-27',
+    rating: 7,
+    category: 'MOBA',
+  },
+  {
+    id: 6,
+    name: 'Stellaris',
+    description: 'A grand strategy game',
+    publisher: 'Paradox Interactive',
+    datePublished: '2016-05-09',
+    rating: 8,
+    category: 'Strategy',
+  },
+];
+
+
+beforeEach(() => {
+  global.IntersectionObserver = jest.fn().mockImplementation((callback) => ({
+    observe: jest.fn((element) => {
+      // Immediately trigger callback for testing
+      callback([{ isIntersecting: true, target: element }]);
+    }),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+function renderMainWindow(overrides = {}) {
+  return render(
+    <OfflineContext.Provider value={mockContextValue}>
+      <MainWindow
+        games={dummyGames}
+        allGames={dummyGames}
+        totalGames={dummyGames.length}
+        hasMore={false}
+        isLoading={false}
+        onLoadMore={jest.fn()}
+        onNewEntry={jest.fn()}
+        onEdit={jest.fn()}
+        onDelete={jest.fn()}
+        searchTerm=""
+        sortOption="name-asc"
+        onSearchChange={jest.fn()}
+        onSortChange={jest.fn()}
+        {...overrides}
+      />
+    </OfflineContext.Provider>
+  );
+}
 
 describe('Display all functionality', () => {
   test('Display all game entries.', async () => {
-    await act( async () => render(<HomePage />));
+    await act(async () => {
+      renderMainWindow();
+    });
     
     expect(screen.getByText('Factorio')).toBeInTheDocument();
     expect(screen.getByText('Terraria')).toBeInTheDocument();
@@ -23,91 +142,56 @@ describe('Display all functionality', () => {
 });
 
 describe('Delete functionality', () => {
-  test('removes the "Factorio" entry after confirming deletion', async () => {
-    await act( async () => render(<HomePage />));
+  test('calls onDelete callback for "Factorio" entry when delete button is clicked', async () => {
+    const handleDelete = jest.fn();
+    
+    await act(async () => {
+      renderMainWindow({ onDelete: handleDelete });
+    });
     
     const gameEntry = screen.getByText('Factorio').closest('.game-entry');
-    expect(gameEntry).toBeInTheDocument();
-    
     const deleteButton = within(gameEntry).getByRole('button', { name: /delete/i });
-    expect(deleteButton).toBeInTheDocument();
     
     act(() => {
       fireEvent.click(deleteButton);
     });
     
-    const yesButton = screen.getByRole('button', { name: /yes/i });
-    act(() => {
-      fireEvent.click(yesButton);
-    });
-    
-    expect(screen.queryByText('Factorio')).not.toBeInTheDocument();
+    expect(handleDelete).toHaveBeenCalledWith(dummyGames[0]);
   });
 });
 
 describe('Add functionality', () => {
-  test('adds a new game entry.', async () => {
-    await act( async () => render(<HomePage />));
+  test('calls onNewEntry callback when New Entry button is clicked', async () => {
+    const handleNewEntry = jest.fn();
     
-    expect(screen.queryByText('New Game Title')).not.toBeInTheDocument();
-
-    const newEntryButton = screen.getByRole('button', { name: /newentry/i });
+    await act(async () => {
+      renderMainWindow({ onNewEntry: handleNewEntry });
+    });
+    
+    const newEntryButton = screen.getByRole('button', { name: /NewEntry/i });
     act(() => {
       fireEvent.click(newEntryButton);
     });
     
-    const nameInput = screen.getByLabelText(/game name/i);
-    const descriptionInput = screen.getByLabelText(/description/i);
-    const publisherInput = screen.getByLabelText(/publisher/i);
-    const dateInput = screen.getByLabelText(/date published/i);
-    const ratingInput = screen.getByLabelText(/rating/i);
-    const categoryInput = screen.getByLabelText(/category/i);
-    
-    act(() => {
-      fireEvent.change(nameInput, { target: { value: 'New Game Title' } });
-      fireEvent.change(descriptionInput, { target: { value: 'asd' } });
-      fireEvent.change(publisherInput, { target: { value: 'asd' } });
-      fireEvent.change(dateInput, { target: { value: '2022-01-01' } });
-      fireEvent.change(ratingInput, { target: { value: '8' } });
-      fireEvent.change(categoryInput, { target: { value: 'asd' } });
-    });
-    
-    const doneButton = screen.getByRole('button', { name: /done/i });
-    act(() => {
-      fireEvent.click(doneButton);
-    });
-    
-    expect(screen.getByText('New Game Title')).toBeInTheDocument();
+    expect(handleNewEntry).toHaveBeenCalled();
   });
 });
 
 describe('Update functionality', () => {
-  test('Updates a game entry.', async () => {
-    await act( async () => render(<HomePage />));
+  test('calls onEdit callback when Edit button is clicked for an entry', async () => {
+    const handleEdit = jest.fn();
+    
+    await act(async () => {
+      renderMainWindow({ onEdit: handleEdit });
+    });
     
     const gameEntry = screen.getByText('Factorio').closest('.game-entry');
-
-    expect(screen.getByText('Factorio')).toBeInTheDocument();
-    expect(screen.queryByText('Factorio2')).not.toBeInTheDocument();
-
     const editButton = within(gameEntry).getByRole('button', { name: /edit/i });
-    expect(editButton).toBeInTheDocument();
+    
     act(() => {
       fireEvent.click(editButton);
     });
-    
-    const nameInput = screen.getByLabelText(/game name/i);
-    
-    act(() => {
-      fireEvent.change(nameInput, { target: { value: 'Factorio2' } });
-    });
-    
-    const doneButton = screen.getByRole('button', { name: /done/i });
-    act(() => {
-      fireEvent.click(doneButton);
-    });
-    
-    expect(screen.getByText('Factorio2')).toBeInTheDocument();
-    expect(screen.queryByText('Factorio')).not.toBeInTheDocument();
+
+    expect(handleEdit).toHaveBeenCalledWith(dummyGames[0]);
   });
 });

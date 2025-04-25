@@ -1,18 +1,71 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import Entry from "./Entry";
 import dynamic from "next/dynamic";
+import { OfflineContext } from "../context/OfflineProvider";
 
 const YearChart = dynamic(() => import("./YearChart"), { ssr: false });
 const RatingChart = dynamic(() => import("./RatingChart"), { ssr: false });
 const CategoryChart = dynamic(() => import("./CategoryChart"), { ssr: false });
 
-export default function MainWindow({games, totalGames, allGames, onNewEntry, onEdit, onDelete, searchTerm, sortOption, currentPage, itemsPerPage, onSearchChange, onSortChange, onPageChange }) 
+export default function MainWindow({games, allGames, onNewEntry, onEdit, onDelete, searchTerm, sortOption, onSearchChange, onSortChange, hasMore, isLoading, onLoadMore }) 
 {
-  const totalPages = Math.ceil(totalGames / itemsPerPage) || 1;
   const highestRating = allGames.length > 0 ? Math.max(...allGames.map((game) => game.rating)) : 0;
   const lowestRating = allGames.length > 0 ? Math.min(...allGames.map((game) => game.rating)) : 0;
+  const sentinelRef = useRef(null);
+  const { isOnline, serverUp } = useContext(OfflineContext);
+  const [retryCooldown, setRetryCooldown] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  
+  useEffect(() => 
+  {
+    const observer = new IntersectionObserver(
+      (entries) => 
+      {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isLoading &&
+          isOnline &&
+          serverUp &&
+          !retryCooldown
+        ) 
+        {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.5 } // Reduced threshold for earlier trigger
+    );
 
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+
+    return () => 
+    {
+      if (sentinelRef.current) observer.unobserve(sentinelRef.current);
+    };
+  }, [hasMore, isLoading, onLoadMore, isOnline, serverUp, retryCooldown]);
+
+  // Add error cooldown logic
+  useEffect(() => 
+  {
+    if (!isOnline || !serverUp) 
+    {
+      setRetryCooldown(true);
+      const timer = setTimeout(() => setRetryCooldown(false), 5000); // 5s cooldown
+      return () => clearTimeout(timer);
+    }
+  }, [isOnline, serverUp]);
+
+  useEffect(() => 
+  {
+    setHasMounted(true);
+  }, []);
+  // Before mounting, render null so SSR and client outputs match.
+  if (!hasMounted) 
+  {
+    return null;
+  }
+  
   return (
     <div
       style={{
@@ -29,6 +82,7 @@ export default function MainWindow({games, totalGames, allGames, onNewEntry, onE
         }}>
         {/* Search bar */}
         <input
+          id="searchInput"
           type="text"
           placeholder="Search..."
           value={searchTerm}
@@ -86,6 +140,8 @@ export default function MainWindow({games, totalGames, allGames, onNewEntry, onE
           <option value="rating-desc">Rating (Desc)</option>
           <option value="category-asc">Category (Asc)</option>
           <option value="category-desc">Category (Desc)</option>
+          <option value="publisher-asc">Publisher (Asc)</option>
+          <option value="publisher-desc">Publisher (Desc)</option>
           <option value="datePublished-asc">date Published (Asc)</option>
           <option value="datePublished-desc">date Published (Desc)</option>
         </select>
@@ -97,6 +153,9 @@ export default function MainWindow({games, totalGames, allGames, onNewEntry, onE
           backgroundColor: "#fff",
           padding: "1rem",
           borderRadius: "25px",
+          maxHeight: "60vh", // Fixed height
+          overflowY: "auto", // Enable vertical scrolling
+          position: "relative",
         }}>
         <div>
           {games.map((game) => (
@@ -110,27 +169,12 @@ export default function MainWindow({games, totalGames, allGames, onNewEntry, onE
             />
           ))}
         </div>
-      </div>
-
-      {/* Pagination Controls */}
-      <div style={{ marginTop: "1rem", textAlign: "center" }}>
-        <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} aria-label="prev" style={{ padding: "0.5rem",
-            fontSize: "1.1rem",
-            fontFamily: 'Lemonada',
-            borderRadius: "20px",
-            border: "1px solid #ccc", }}>
-          Prev
-        </button>
-        <span style={{ margin: "0 1rem" }}>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} aria-label="next" style={{ padding: "0.5rem",
-            fontSize: "1.1rem",
-            fontFamily: 'Lemonada',
-            borderRadius: "20px",
-            border: "1px solid #ccc", }}>
-          Next
-        </button>
+        <div ref={sentinelRef} style={{ 
+          height: "20px",
+          visibility: hasMore ? "visible" : "hidden"
+        }}>
+          {isLoading && <span>Loading more games...</span>}
+        </div>
       </div>
 
       {/* Data Charts Section */}

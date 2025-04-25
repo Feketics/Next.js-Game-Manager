@@ -38,6 +38,19 @@ export default function EditWindow({ game, onClose, onSubmit, errorMessage })
     onSubmit(updatedGame);
   };
 
+  const [hasMounted, setHasMounted] = useState(false);
+  
+  useEffect(() => 
+  {
+    setHasMounted(true);
+  }, []);
+
+  // Before mounting, render null so SSR and client outputs match.
+  if (!hasMounted) 
+  {
+    return null;
+  }
+
   return (
     <div
       style={{

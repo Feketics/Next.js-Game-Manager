@@ -21,7 +21,7 @@ export default function Entry({ game, onEdit, onDelete, isHighest, isLowest })
       }}
     >
       <div style={{ flex: 1}}>
-        <strong>{game.name}</strong> | {game.category} | Rating: {game.rating} | Published: {publishYear}
+        <strong>{game.name}</strong> | {game.category} | Rating: {game.rating} | Publisher: {game.publisher} | Published: {publishYear}
       </div>
       <div style={{ display: "flex", gap: "0.5rem" }}>
         {/* Edit button */}
