@@ -1,327 +1,16 @@
-let games = [
-    {
-        id: 1,
-        name: "Factorio",
-        description: "The Factory must grow!",
-        publisher: "Publisher1",
-        datePublished: "2023-01-01",
-        rating: 8.5,
-        category: "Strategy",
-      },
-      {
-        id: 2,
-        name: "Terraria",
-        description: "Idk haven't played it.",
-        publisher: "Publisher2",
-        datePublished: "2023-11-01",
-        rating: 8,
-        category: "Rpg",
-      },
-      {
-        id: 3,
-        name: "Baldur's Gate 3",
-        description: "The gate that belongs to Baldur or something.",
-        publisher: "Publisher1",
-        datePublished: "2024-07-18",
-        rating: 9.5,
-        category: "Rpg",
-      },
-      {
-        id: 4,
-        name: "Minecraft",
-        description: "It's minecraft.",
-        publisher: "Publisher2",
-        datePublished: "2002-11-21",
-        rating: 9,
-        category: "Sandbox",
-      },
-      {
-        id: 5,
-        name: "League of Legends",
-        description: "Rating given by the players, not me!",
-        publisher: "Publisher3",
-        datePublished: "2017-12-12",
-        rating: 7,
-        category: "Moba?",
-      },
-      {
-        id: 6,
-        name: "Stellaris",
-        description: "Not for the faint of heart.",
-        publisher: "Paradox",
-        datePublished: "2023-01-01",
-        rating: 8,
-        category: "Strategy",
-      },
-      {
-        id: 7,
-        name: "Steel Division 2",
-        description: "Guns and stuff.",
-        publisher: "Studio Gil",
-        datePublished: "2023-01-01",
-        rating: 7.95,
-        category: "Strategy",
-      },
-      {
-        id: 8,
-        name: "Victoria 3",
-        description: "Another Paradox game.",
-        publisher: "Paradox",
-        datePublished: "2024-08-12",
-        rating: 7.5,
-        category: "Strategy",
-      },
-      {
-        id: 9,
-        name: "Hearts of Iron IV",
-        description: "World War 2 strategy game.",
-        publisher: "Paradox",
-        datePublished: "2018-07-01",
-        rating: 8.30,
-        category: "Strategy",
-      },
-      {
-        id: 10,
-        name: "Total War: Rome 2",
-        description: "Romans and stuff.",
-        publisher: "Creative Assembly",
-        datePublished: "2016-01-01",
-        rating: 7.5,
-        category: "Strategy",
-      },
-      {
-        id: 11,
-        name: "Call of Duty",
-        description: "Shooter stuff.",
-        publisher: "Studio Gil",
-        datePublished: "2023-01-01",
-        rating: 8,
-        category: "FPS",
-      },
-      {
-        id: 12,
-        name: "Metal Gear Solid",
-        description: "Pew pew.",
-        publisher: "Studio Gil",
-        datePublished: "2023-01-01",
-        rating: 8.5,
-        category: "FPS",
-      },
-      {
-        id: 13,
-        name: "Fifa 14",
-        description: "Footbal game.",
-        publisher: "Creative Assembly",
-        datePublished: "2023-01-01",
-        rating: 8.5,
-        category: "Sport",
-      },
-      {
-        id: 14,
-        name: "Fifa 16",
-        description: "Footbal game.",
-        publisher: "Creative Assembly",
-        datePublished: "2023-01-01",
-        rating: 8.5,
-        category: "Sport",
-      },
-      {
-        id: 15,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 16,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 17,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 18,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 19,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 20,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 21,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 22,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 23,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 24,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 25,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 26,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 27,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 28,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 29,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 30,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 31,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 32,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 33,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 34,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      },
-      {
-        id: 35,
-        name: "Bloat Game",
-        description: "Bloat game.",
-        publisher: "Bloatware Inc.",
-        datePublished: "2023-01-01",
-        rating: 7.5,
-        category: "Bloatware",
-      }
-  ];
-  
-  const corsHeaders = 
-  {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
-  };
+import { query } from '../../lib/db.js';
+
+const corsHeaders = 
+{
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type'
+};
+
+function toISODate(dateVal) {
+  const d = dateVal instanceof Date ? dateVal : new Date(dateVal);
+  return d.toISOString().slice(0, 10);
+}
   
   function validateGame(data) 
   {
@@ -390,159 +79,194 @@ let games = [
     });
   }
   
-  export async function GET(request) 
-  {
+  export async function GET(request) {
     const { searchParams } = new URL(request.url);
-    let result = games;
-
+  
+    // --- Filtering
+    const whereClauses = [];
+    const params = [];
     const search = searchParams.get('search');
-    if (search) 
-    {
-      result = result.filter(
-        game =>
-          game.name.toLowerCase().includes(search.toLowerCase()) ||
-          game.category.toLowerCase().includes(search.toLowerCase())
-      );
+    if (search) {
+      params.push(`%${search}%`);
+      whereClauses.push(`(name ILIKE $${params.length} OR category ILIKE $${params.length})`);
     }
-
+    const whereSQL = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
+  
+    // --- Sorting (add id tie-breaker for stable pagination)
+    let orderSQL = '';
     const sortParam = searchParams.get('sort');
-    if (sortParam) 
-    {
-      const [key, direction] = sortParam.split('-');
-
-      result = result.sort((a, b) => 
-      {
-        let comparison = 0;
-        if (key === 'rating') 
-        {
-          comparison = Number(a.rating) - Number(b.rating);
-        } 
-        else if (key === 'year') 
-        {
-          const yearA = new Date(a.datePublished).getFullYear();
-          const yearB = new Date(b.datePublished).getFullYear();
-          comparison = yearA - yearB;
-        } 
-        else 
-        {
-          const valA = a[key]?.toLowerCase() || '';
-          const valB = b[key]?.toLowerCase() || '';
-          if (valA < valB) comparison = -1;
-          else if (valA > valB) comparison = 1;
-        }
-        return direction === 'asc' ? comparison : -comparison;
-      });
+    if (sortParam) {
+      const [key, dir] = sortParam.split('-');
+      const colMap = {
+        rating: 'rating',
+        year: 'date_published',
+        name: 'name',
+        category: 'category',
+        publisher: 'publisher'
+      };
+      const col = colMap[key] || 'name';
+      const dirStr = dir.toUpperCase();
+      orderSQL = `ORDER BY ${col} ${dirStr}, id ${dirStr}`;
     }
   
-    const page = Number(searchParams.get('page')) || 1;
-    const limit = Number(searchParams.get('limit')) || 10;
-    const startIndex = (page - 1) * limit;
-    const paginatedResult = result.slice(startIndex, startIndex + limit);
+    // --- Pagination params
+    const page = Number(searchParams.get('page') ?? 1);
+    const limit = Number(searchParams.get('limit') ?? 10);
+    const offset = (page - 1) * limit;
+  
+    // --- allData (full list, sorted by id for consistency)
+    const allRes = await query(`SELECT * FROM games ORDER BY id ASC`);
+    const allData = allRes.rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      publisher: r.publisher,
+      datePublished: toISODate(r.date_published),
+      rating: Number(r.rating),
+      category: r.category,
+    }));
+  
+    // --- total count of filtered
+    const countRes = await query(
+      `SELECT COUNT(*) FROM games ${whereSQL}`,
+      params
+    );
+    const total = Number(countRes.rows[0].count);
+  
+    // --- paginated data
+    const dataRes = await query(
+      `SELECT * FROM games
+       ${whereSQL}
+       ${orderSQL}
+       LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, limit, offset]
+    );
+    const data = dataRes.rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      publisher: r.publisher,
+      datePublished: toISODate(r.date_published),
+      rating: Number(r.rating),
+      category: r.category,
+    }));
   
     return new Response(
-      JSON.stringify({ allData: games, data: paginatedResult, total: result.length }),
-      {
-        status: 200,
-        headers: 
-        {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
-      }
+      JSON.stringify({ allData, data, total }),
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
   
-  export async function POST(request) 
-  {
+  export async function POST(request) {
     const body = await request.json();
     const errors = validateGame(body);
-    if (errors.length > 0) 
-    {
-      return new Response(JSON.stringify({ errors }), 
-      {
+    if (errors.length) {
+      return new Response(JSON.stringify({ errors }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
-
-    const newGame = { id: Date.now(), ...body };
-    games.push(newGame);
-
-    return new Response(JSON.stringify(newGame), 
-    {
+  
+    const insertRes = await query(
+      `INSERT INTO games
+       (name, description, publisher, date_published, rating, category)
+       VALUES ($1,$2,$3,$4,$5,$6)
+       RETURNING *`,
+      [body.name, body.description, body.publisher, body.datePublished, body.rating, body.category]
+    );
+    const g = insertRes.rows[0];
+    const newGame = {
+      id: g.id,
+      name: g.name,
+      description: g.description,
+      publisher: g.publisher,
+      datePublished: g.date_published,
+      rating: Number(g.rating),
+      category: g.category,
+    };
+    return new Response(JSON.stringify(newGame), {
       status: 201,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
   
-  export async function PUT(request) 
-  {
+  export async function PUT(request)  {
     const body = await request.json();
+    if (!body.id) {
+      return new Response(JSON.stringify({ error: 'Missing id' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
     const errors = validateGame(body);
-    if (errors.length > 0) 
-    {
-      return new Response(JSON.stringify({ errors }), 
-      {
+    if (errors.length) {
+      return new Response(JSON.stringify({ errors }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
-
-    if (!body.id) 
-    {
-      return new Response(JSON.stringify({ error: 'Missing id' }), 
-      {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
-    }
-
-    const index = games.findIndex(game => game.id === body.id);
-    if (index === -1) 
-    {
-      return new Response(JSON.stringify({ error: 'Game not found' }), 
-      {
+  
+    const updateRes = await query(
+      `UPDATE games SET
+         name=$1, description=$2, publisher=$3,
+         date_published=$4, rating=$5, category=$6
+       WHERE id=$7
+       RETURNING *`,
+      [body.name, body.description, body.publisher, body.datePublished, body.rating, body.category, body.id]
+    );
+    if (!updateRes.rowCount) {
+      return new Response(JSON.stringify({ error: 'Game not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
-
-    games[index] = { ...games[index], ...body };
-    return new Response(JSON.stringify(games[index]), 
-    {
+    const g = updateRes.rows[0];
+    const updated = {
+      id: g.id,
+      name: g.name,
+      description: g.description,
+      publisher: g.publisher,
+      datePublished: g.date_published,
+      rating: Number(g.rating),
+      category: g.category,
+    };
+    return new Response(JSON.stringify(updated), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
   
-  export async function DELETE(request) 
-  {
+  export async function DELETE(request) {
     const { searchParams } = new URL(request.url);
     const id = Number(searchParams.get('id'));
-    if (!id) 
-    {
-      return new Response(JSON.stringify({ error: 'Missing id' }), 
-      {
+    if (!id) {
+      return new Response(JSON.stringify({ error: 'Missing id' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
-
-    const index = games.findIndex(game => game.id === id);
-    if (index === -1) 
-    {
-      return new Response(JSON.stringify({ error: 'Game not found' }), 
-      {
+    const delRes = await query(
+      `DELETE FROM games WHERE id=$1 RETURNING *`,
+      [id]
+    );
+    if (!delRes.rowCount) {
+      return new Response(JSON.stringify({ error: 'Game not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
-
-    const deletedGame = games.splice(index, 1)[0];
-    return new Response(JSON.stringify(deletedGame), 
-    {
+    const g = delRes.rows[0];
+    const deleted = {
+      id: g.id,
+      name: g.name,
+      description: g.description,
+      publisher: g.publisher,
+      datePublished: g.date_published,
+      rating: Number(g.rating),
+      category: g.category,
+    };
+    return new Response(JSON.stringify(deleted), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-  

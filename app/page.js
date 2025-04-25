@@ -153,7 +153,8 @@ export default function HomePage()
         {
           setShowEdit(false);
           setErrorMessage("");
-          fetchGames();
+          setCurrentPage(1);
+          setGames([]); 
         }
       } 
       catch (error) 
@@ -183,10 +184,10 @@ export default function HomePage()
     {
       try 
       {
-        await fetch(`/api/games?id=${selectedGame.id}`, {method: "DELETE",});
+        await fetch(`/api/games?id=${selectedGame.id}`, { method: "DELETE" });
         setShowConfirmation(false);
         setCurrentPage(1);
-        fetchGames();
+        setGames([]);
       } 
       catch (error) 
       {
