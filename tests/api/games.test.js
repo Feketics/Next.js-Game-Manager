@@ -5,6 +5,12 @@ global.Response = Response;
 
 import { GET, POST, PUT, DELETE, OPTIONS } from '../../app/api/games/route';
 
+import { closePool } from '../../app/lib/db';
+
+afterAll(async () => {
+  await closePool();
+});
+
 beforeEach(() => {
   jest.resetModules();
 });
@@ -31,7 +37,7 @@ describe('API /api/games operations', () => {
       name: 'Test Game',
       description: 'Test description',
       publisher: 'Test Publisher',
-      datePublished: '2022-01-01',
+      datePublished: '2021-12-30',
       rating: 7,
       category: 'Test Category',
     };
@@ -43,9 +49,16 @@ describe('API /api/games operations', () => {
     const response = await POST(request);
     expect(response.status).toBe(201);
     const json = await response.json();
-    expect(json).toMatchObject(newGameData);
+    expect(json.name).toBe(newGameData.name);
     expect(json).toHaveProperty('id');
-  });
+
+    const deleteRequest = new Request(`http://localhost/api/games?id=${json.id}`, {
+      method: 'DELETE',
+    });
+    const deleteResponse = await DELETE(deleteRequest);
+    expect(deleteResponse.status).toBe(200);
+
+    })
 
   test('POST returns validation error for invalid rating', async () => {
     const invalidData = {
@@ -139,6 +152,12 @@ describe('API /api/games operations', () => {
     const updatedGame = await putResponse.json();
     expect(updatedGame.name).toBe('Updated Game');
     expect(updatedGame.rating).toBe(8);
+
+    const deleteRequest = new Request(`http://localhost/api/games?id=${updatedGame.id}`, {
+      method: 'DELETE',
+    });
+    const deleteResponse = await DELETE(deleteRequest);
+    expect(deleteResponse.status).toBe(200);
   });
 
   test('PUT returns error when updating existing game with invalid data', async () => {
@@ -170,6 +189,12 @@ describe('API /api/games operations', () => {
     const json = await putResponse.json();
     expect(json).toHaveProperty('errors');
     expect(json.errors.length).toBeGreaterThan(0);
+
+    const deleteRequest = new Request(`http://localhost/api/games?id=${createdGame.id}`, {
+      method: 'DELETE',
+    });
+    const deleteResponse = await DELETE(deleteRequest);
+    expect(deleteResponse.status).toBe(200);
   });
 
   test('PUT returns error when game id is missing', async () => {

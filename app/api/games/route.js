@@ -7,7 +7,8 @@ const corsHeaders =
   'Access-Control-Allow-Headers': 'Content-Type'
 };
 
-function toISODate(dateVal) {
+function toISODate(dateVal) 
+{
   const d = dateVal instanceof Date ? dateVal : new Date(dateVal);
   return d.toISOString().slice(0, 10);
 }
@@ -79,25 +80,27 @@ function toISODate(dateVal) {
     });
   }
   
-  export async function GET(request) {
+  export async function GET(request) 
+  {
     const { searchParams } = new URL(request.url);
   
-    // --- Filtering
     const whereClauses = [];
     const params = [];
     const search = searchParams.get('search');
-    if (search) {
+    if (search) 
+    {
       params.push(`%${search}%`);
       whereClauses.push(`(name ILIKE $${params.length} OR category ILIKE $${params.length})`);
     }
     const whereSQL = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : '';
   
-    // --- Sorting (add id tie-breaker for stable pagination)
     let orderSQL = '';
     const sortParam = searchParams.get('sort');
-    if (sortParam) {
+    if (sortParam)
+    {
       const [key, dir] = sortParam.split('-');
-      const colMap = {
+      const colMap =
+      {
         rating: 'rating',
         year: 'date_published',
         name: 'name',
@@ -109,14 +112,13 @@ function toISODate(dateVal) {
       orderSQL = `ORDER BY ${col} ${dirStr}, id ${dirStr}`;
     }
   
-    // --- Pagination params
     const page = Number(searchParams.get('page') ?? 1);
     const limit = Number(searchParams.get('limit') ?? 10);
     const offset = (page - 1) * limit;
   
-    // --- allData (full list, sorted by id for consistency)
     const allRes = await query(`SELECT * FROM games ORDER BY id ASC`);
-    const allData = allRes.rows.map(r => ({
+    const allData = allRes.rows.map(r => (
+    {
       id: r.id,
       name: r.name,
       description: r.description,
@@ -126,14 +128,12 @@ function toISODate(dateVal) {
       category: r.category,
     }));
   
-    // --- total count of filtered
     const countRes = await query(
       `SELECT COUNT(*) FROM games ${whereSQL}`,
       params
     );
     const total = Number(countRes.rows[0].count);
   
-    // --- paginated data
     const dataRes = await query(
       `SELECT * FROM games
        ${whereSQL}
@@ -141,7 +141,9 @@ function toISODate(dateVal) {
        LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
       [...params, limit, offset]
     );
-    const data = dataRes.rows.map(r => ({
+
+    const data = dataRes.rows.map(r => (
+    {
       id: r.id,
       name: r.name,
       description: r.description,
@@ -157,11 +159,14 @@ function toISODate(dateVal) {
     );
   }
   
-  export async function POST(request) {
+  export async function POST(request)
+  {
     const body = await request.json();
     const errors = validateGame(body);
-    if (errors.length) {
-      return new Response(JSON.stringify({ errors }), {
+    if (errors.length)
+    {
+      return new Response(JSON.stringify({ errors }),
+      {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
@@ -174,8 +179,10 @@ function toISODate(dateVal) {
        RETURNING *`,
       [body.name, body.description, body.publisher, body.datePublished, body.rating, body.category]
     );
+
     const g = insertRes.rows[0];
-    const newGame = {
+    const newGame =
+    {
       id: g.id,
       name: g.name,
       description: g.description,
@@ -184,23 +191,30 @@ function toISODate(dateVal) {
       rating: Number(g.rating),
       category: g.category,
     };
-    return new Response(JSON.stringify(newGame), {
+    return new Response(JSON.stringify(newGame),
+    {
       status: 201,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
   
-  export async function PUT(request)  {
+  export async function PUT(request) 
+  {
     const body = await request.json();
-    if (!body.id) {
-      return new Response(JSON.stringify({ error: 'Missing id' }), {
+    if (!body.id)
+    {
+      return new Response(JSON.stringify({ error: 'Missing id' }),
+      {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
+
     const errors = validateGame(body);
-    if (errors.length) {
-      return new Response(JSON.stringify({ errors }), {
+    if (errors.length)
+    {
+      return new Response(JSON.stringify({ errors }),
+      {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
@@ -214,14 +228,19 @@ function toISODate(dateVal) {
        RETURNING *`,
       [body.name, body.description, body.publisher, body.datePublished, body.rating, body.category, body.id]
     );
-    if (!updateRes.rowCount) {
-      return new Response(JSON.stringify({ error: 'Game not found' }), {
+
+    if (!updateRes.rowCount)
+    {
+      return new Response(JSON.stringify({ error: 'Game not found' }),
+      {
         status: 404,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
+
     const g = updateRes.rows[0];
-    const updated = {
+    const updated =
+    {
       id: g.id,
       name: g.name,
       description: g.description,
@@ -230,17 +249,21 @@ function toISODate(dateVal) {
       rating: Number(g.rating),
       category: g.category,
     };
+
     return new Response(JSON.stringify(updated), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
   
-  export async function DELETE(request) {
+  export async function DELETE(request)
+  {
     const { searchParams } = new URL(request.url);
     const id = Number(searchParams.get('id'));
-    if (!id) {
-      return new Response(JSON.stringify({ error: 'Missing id' }), {
+    if (!id)
+    {
+      return new Response(JSON.stringify({ error: 'Missing id' }),
+      {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
@@ -249,14 +272,19 @@ function toISODate(dateVal) {
       `DELETE FROM games WHERE id=$1 RETURNING *`,
       [id]
     );
-    if (!delRes.rowCount) {
-      return new Response(JSON.stringify({ error: 'Game not found' }), {
+
+    if (!delRes.rowCount)
+    {
+      return new Response(JSON.stringify({ error: 'Game not found' }),
+      {
         status: 404,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
+
     const g = delRes.rows[0];
-    const deleted = {
+    const deleted =
+    {
       id: g.id,
       name: g.name,
       description: g.description,
@@ -265,6 +293,7 @@ function toISODate(dateVal) {
       rating: Number(g.rating),
       category: g.category,
     };
+    
     return new Response(JSON.stringify(deleted), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
