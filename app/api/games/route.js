@@ -1,6 +1,9 @@
 // app/api/games/route.js
 import { query } from '../../lib/db.js';
 import { verifyToken } from '../../lib/auth.js';
+import { startLogMonitor } from '../../monitor/logMonitor.js';
+
+startLogMonitor();
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

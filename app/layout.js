@@ -1,6 +1,6 @@
 // app/layout.js
 import { Lemonada } from 'next/font/google';
-import Link from 'next/link';
+import Nav from './components/Nav';
 import OfflineProvider from "./context/OfflineProvider";
 import ClientOfflineBanner from "./components/ClientOfflineBanner";
 
@@ -16,13 +16,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={lemonada.className}>
       <body>
         <OfflineProvider>
-          {/* Navigation Links */}
-          <nav style={{ padding: '1rem', backgroundColor: '#ececec', display: 'flex', gap: '5rem' }}>
-            <Link href="/">Home</Link>
-            <Link href="/register">Register</Link>
-            <Link href="/login">Login</Link>
-            <Link href="/account">Account</Link>
-          </nav>
+          <Nav />
 
           {/* Offline banner */}
           <ClientOfflineBanner />
