@@ -5,8 +5,8 @@ const pool = new Pool(
   host: process.env.PGHOST || 'localhost',
   port: parseInt(process.env.PGPORT, 10) || 5432,
   database: process.env.PGDATABASE || 'gamemanager',
-  user: process.env.PGUSER || 'gameadmin',
-  password: process.env.PGPASSWORD || 'alma1',
+  user: process.env.PGUSER || 'postgres',
+  password: process.env.PGPASSWORD || 'Hunor1212',
 });
 
 export async function query(text, params = [])

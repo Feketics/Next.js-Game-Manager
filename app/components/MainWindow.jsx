@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef, useContext } from "react";
+import Link from 'next/link';
 import Entry from "./Entry";
 import dynamic from "next/dynamic";
 import { OfflineContext } from "../context/OfflineProvider";
