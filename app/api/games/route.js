@@ -147,6 +147,13 @@ export async function POST(request) {
     rating: Number(g.rating),
     category: g.category,
   };
+
+  await query(
+    `INSERT INTO game_logs (user_id, action, performed_at)
+     VALUES ($1,'CREATE',NOW())`,
+    [userId]
+  );
+
   return new Response(JSON.stringify(newGame), { status: 201, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
 }
 
@@ -173,6 +180,13 @@ export async function PUT(request) {
   }
   const g = updateRes.rows[0];
   const updated = { id: g.id,name: g.name,description: g.description,publisher: g.publisher,datePublished: g.date_published,rating: Number(g.rating),category: g.category };
+
+  await query(
+    `INSERT INTO game_logs (user_id, action, performed_at)
+    VALUES ($1,'UPDATE',NOW())`,
+    [userId]
+  );
+
   return new Response(JSON.stringify(updated), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
 }
 
@@ -191,5 +205,12 @@ export async function DELETE(request) {
   }
   const g = delRes.rows[0];
   const deleted = { id: g.id,name: g.name,description: g.description,publisher: g.publisher,datePublished: g.date_published,rating: Number(g.rating),category: g.category };
+
+  await query(
+    `INSERT INTO game_logs (user_id, action, performed_at)
+     VALUES ($1,'DELETE',NOW())`,
+    [userId]
+  );
+
   return new Response(JSON.stringify(deleted), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
 }
