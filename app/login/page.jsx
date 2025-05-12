@@ -50,21 +50,64 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 300, margin: 'auto', padding: '2rem' }}>
+    <div style={{
+      backgroundColor: "#60CA9F",
+      padding: "1rem",
+      display: "flex",
+      minHeight: "100vh",
+      alignItems: "center",
+    }}>
       {stage === 'credentials' ? (
-        <form onSubmit={submitCredentials}>
+        <form onSubmit={submitCredentials} style={{
+          backgroundColor: '#D9D9D9',
+          padding: "2rem",
+          borderRadius: "25px",
+          minWidth: "300px",
+          minHeight: "300px",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}>
           <h2>Login</h2>
-          <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Username" />
-          <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" />
-          <button type="submit">Login</button>
+          <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="Username" style={{fontFamily: 'Lemonada',}}/><br/><br/>
+          <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" style={{fontFamily: 'Lemonada',}}/><br/><br/>
+          <button type="submit" style={{
+                  marginLeft: "1rem",
+                  padding: "0.5rem 1rem",
+                  border: "none",
+                  borderRadius: "20px",
+                  fontFamily: 'Lemonada',
+                  fontSize: "1.1rem",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                }}>Login</button>
           {error && <p style={{ color:'red' }}>{error}</p>}
         </form>
       ) : (
-        <form onSubmit={submitOtp}>
+        <form onSubmit={submitOtp} style={{
+          backgroundColor: '#D9D9D9',
+          padding: "2rem",
+          borderRadius: "25px",
+          minWidth: "300px",
+          minHeight: "300px",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}>
           <h2>Enter OTP</h2>
-          {devOtp && <p style={{ color:'blue' }}>DEV OTP: {devOtp}</p>}
-          <input value={otp} onChange={e=>setOtp(e.target.value)} placeholder="6-digit code" />
-          <button type="submit">Verify</button>
+          <input value={otp} onChange={e=>setOtp(e.target.value)} placeholder="6-digit code" style={{fontFamily: 'Lemonada',}}/><br/><br/>
+          <button type="submit" style={{
+                  marginLeft: "1rem",
+                  padding: "0.5rem 1rem",
+                  border: "none",
+                  borderRadius: "20px",
+                  fontFamily: 'Lemonada',
+                  fontSize: "1.1rem",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                }}>Verify</button>
           {error && <p style={{ color:'red' }}>{error}</p>}
         </form>
       )}
