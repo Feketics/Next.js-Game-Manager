@@ -2,8 +2,8 @@ import { query } from '../../../lib/db.js';
 import { hashPwd, signToken } from '../../../lib/auth.js';
 
 export async function POST(req) {
-  const { username, password } = await req.json();
-  if (!username || !password) {
+  const { username, password, email } = await req.json();
+  if (!username || !password || !email) {
     return new Response('Missing fields', { status: 400 });
   }
 
@@ -15,9 +15,9 @@ export async function POST(req) {
 
   const passHash = await hashPwd(password);
   const res = await query(
-    `INSERT INTO users (username,password,role_id)
-     VALUES ($1,$2,2) RETURNING id,username,role_id`,
-    [username, passHash]
+    `INSERT INTO users (username,password,role_id,email)
+     VALUES ($1,$2,2,$3) RETURNING id,username,role_id`,
+    [username, passHash, email]
   );
   const user = res.rows[0];
   const token = signToken(user);

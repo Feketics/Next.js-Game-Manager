@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-  const [u,p,e] = [useState(''),useState(''),useState('')];
+  const [u,p,em] = [useState(''),useState(''),useState('')];
   const router = useRouter();
 
   const onSubmit = async (e2) => {
@@ -11,7 +11,7 @@ export default function RegisterPage() {
     const res = await fetch('/api/auth/register', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ username: u[0], password: p[0] })
+      body: JSON.stringify({ username: u[0], password: p[0], email: em[0] })
     });
     if (res.ok) router.push('/');
     else e[1]('Registration failed');
@@ -38,6 +38,7 @@ export default function RegisterPage() {
         }}>
         <h2>Register</h2>
         <input value={u[0]} onChange={e=>u[1](e.target.value)} placeholder="Username" style={{fontFamily: 'Lemonada',}}/><br/><br/>
+        <input value={em[0]} onChange={e=>em[1](e.target.value)} placeholder="Email" style={{fontFamily: 'Lemonada',}}/><br/><br/>
         <input type="password" value={p[0]} onChange={e=>p[1](e.target.value)} placeholder="Password" style={{fontFamily: 'Lemonada',}}/><br/><br/>
         <button type="submit" style={{
                   marginLeft: "1rem",
