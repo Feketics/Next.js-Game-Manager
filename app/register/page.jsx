@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
-  const [u,p,em] = [useState(''),useState(''),useState('')];
+  const [u,p,e,em] = [useState(''),useState(''),useState(''),useState('')];
   const router = useRouter();
 
   const onSubmit = async (e2) => {
