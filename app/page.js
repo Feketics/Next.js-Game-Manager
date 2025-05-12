@@ -106,7 +106,7 @@ function ProtectedHome() {
       const res = await fetch("/api/games", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedGame) });
       const json = await res.json();
       if (!res.ok) setErrorMessage(json.errors ? json.errors.join(" ") : json.error);
-      else { setShowEdit(false); setErrorMessage(""); setCurrentPage(1); fetchGames(); }
+      else { setShowEdit(false); setErrorMessage(""); setGames([]); setCurrentPage(1); fetchGames(); }
     } catch (error) { console.error("Error saving game:", error); }
   };
 
@@ -114,7 +114,7 @@ function ProtectedHome() {
     const online = navigator.onLine;
     const server = await isServerAvailable();
     if (!online || !server) { enqueueOperation({ type: "DELETE", endpoint: `/api/games?id=${selectedGame.id}`, method: "DELETE", payload: { id: selectedGame.id } }); alert("Delete action queued. Will sync when online."); setShowConfirmation(false); return; }
-    try { await fetch(`/api/games?id=${selectedGame.id}`, { method: "DELETE" }); setShowConfirmation(false); setCurrentPage(1); fetchGames(); } catch (error) { console.error("Error deleting game:", error); }
+    try { await fetch(`/api/games?id=${selectedGame.id}`, { method: "DELETE" }); setShowConfirmation(false); setGames([]); setCurrentPage(1); fetchGames(); } catch (error) { console.error("Error deleting game:", error); }
   };
 
   return (

@@ -33,5 +33,5 @@ async function detectSuspiciousUsers() {
 }
 
 export function startLogMonitor() {
-  setInterval(detectSuspiciousUsers, INTERVAL_MINUTES * 60 * 1000);
+  setInterval(detectSuspiciousUsers, 10000);
 }
