@@ -14,7 +14,7 @@ export default function Nav() {
   const [checked, setChecked] = useState(skipAuth);
 
   useEffect(() => {
-    if (skipAuth) return;            // skip fetching on login/register
+    if (skipAuth) return;            // skip fetching on login/register 
     setChecked(false);
     fetch('/api/users/me', { cache: 'no-store' })
       .then(res => {
